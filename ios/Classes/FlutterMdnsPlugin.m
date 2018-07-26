@@ -70,9 +70,12 @@
                     self.discoveryRunningHandler.isReady;
 }
 
-- (void) startDiscovery:(NSString *)serviceName {
+- (void) startDiscoveryTimerFinished:(NSTimer *)timer {
+    // user info is the passed in service name
+    [self startDiscovery:(NSString *)timer.userInfo];
+}
 
-    NSLog(@"START DISCOVERY! %@", serviceName);
+- (void) startDiscovery:(NSString *)serviceName {
 
     // Sometimes flutter needs a few moments before the eventSink set
     // in the event handlers, we'll just check once every 100ms if
@@ -80,7 +83,7 @@
     if (! self.areAllStreamHandlersReady) {
         [NSTimer scheduledTimerWithTimeInterval:0.1f
                                          target:self
-                                       selector:@selector(startDiscovery:)
+                                       selector:@selector(startDiscoveryTimerFinished:)
                                        userInfo:serviceName
                                         repeats:NO];
         return;
