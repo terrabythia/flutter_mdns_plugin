@@ -164,7 +164,8 @@
     return @{
             @"name": nil == [aNetService name] ? @"" : [aNetService name],
             @"type": nil == [aNetService type] ? @"" : [aNetService type],
-            @"host": nil == address ? @"" : address,
+            @"hostName": nil == [aNetService type] ? @"" : [aNetService type],
+            @"address": nil == address ? @"" : address,
             @"port": @([aNetService port])
     };
 }
