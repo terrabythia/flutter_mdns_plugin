@@ -160,8 +160,10 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
     map.put("name", info.getServiceName() != null ? info.getServiceName() : "");
 
     map.put("type", info.getServiceType() != null ? info.getServiceType() : "");
-
-    map.put("host", info.getHost() != null ? info.getHost().toString() : "");
+    
+    map.put("hostName", info.getHost() != null ? info.getHost().getHostName() : "");
+    
+    map.put("address", info.getHost() != null ? info.getHost().getHostAddress() : "");
 
     map.put("port", info.getPort());
 
