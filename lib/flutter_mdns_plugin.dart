@@ -8,6 +8,7 @@ class ServiceInfo{
   ServiceInfo(this.name, this.type, this.host, this.port);
 
   static ServiceInfo fromMap(Map fromChannel){
+    print (fromChannel);
     String name = "";
     String type = "";
     String host = "";
