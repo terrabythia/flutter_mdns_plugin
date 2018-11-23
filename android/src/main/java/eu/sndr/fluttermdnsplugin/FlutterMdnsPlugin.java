@@ -119,8 +119,22 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
 
         mNsdManager.resolveService(nsdServiceInfo, new NsdManager.ResolveListener() {
           @Override
-          public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int i) {
+          public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int errorCode) {
             Log.d(TAG, "Failed to resolve service : " + nsdServiceInfo.toString());
+
+            switch (errorCode) {
+              case NsdManager.FAILURE_ALREADY_ACTIVE:
+                  Log.e(TAG, "FAILURE_ALREADY_ACTIVE");
+                  // Just try again...
+                  onServiceFound(nsdServiceInfo);
+                  break;
+              case NsdManager.FAILURE_INTERNAL_ERROR:
+                  Log.e(TAG, "FAILURE_INTERNAL_ERROR");
+                  break;
+              case NsdManager.FAILURE_MAX_LIMIT:
+                  Log.e(TAG, "FAILURE_MAX_LIMIT");
+                  break;
+            }
           }
 
           @Override
