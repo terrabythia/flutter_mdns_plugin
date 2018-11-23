@@ -161,7 +161,10 @@
 }
 
 - (NSDictionary *) serviceToDictionary:(NSNetService *)aNetService withAddress:(NSString *)address  {
+    NSData* data = [aNetService TXTRecordData];
+    NSDictionary* dict = [NSNetService dictionaryFromTXTRecordData:data];
     return @{
+            @"attr": nil == dict ? @"" : dict,
             @"name": nil == [aNetService name] ? @"" : [aNetService name],
             @"type": nil == [aNetService type] ? @"" : [aNetService type],
             @"hostName": nil == [aNetService hostName] ? @"" : [aNetService hostName],

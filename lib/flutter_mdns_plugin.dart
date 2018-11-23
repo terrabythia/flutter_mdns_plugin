@@ -19,7 +19,7 @@ class ServiceInfo{
     int port = 0;
 
     if (fromChannel.containsKey("attr") ) {
-      attr = fromChannel["attr"];
+      attr = Map<String, Uint8List>.from(fromChannel["attr"]);
     }
 
     if (fromChannel.containsKey("name") ) {
