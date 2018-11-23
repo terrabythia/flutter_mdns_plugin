@@ -157,12 +157,14 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
   private static Map<String, Object> ServiceToMap(NsdServiceInfo info) {
     Map<String, Object> map = new HashMap<>();
 
+    map.put("attr", info.getAttributes() != null ? info.getAttributes() : "");
+
     map.put("name", info.getServiceName() != null ? info.getServiceName() : "");
 
     map.put("type", info.getServiceType() != null ? info.getServiceType() : "");
-    
+
     map.put("hostName", info.getHost() != null ? info.getHost().getHostName() : "");
-    
+
     map.put("address", info.getHost() != null ? info.getHost().getHostAddress() : "");
 
     map.put("port", info.getPort());

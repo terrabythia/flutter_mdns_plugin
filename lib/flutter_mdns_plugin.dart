@@ -1,19 +1,28 @@
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 class ServiceInfo{
+  Map<String, Uint8List> attr;
   String name;
   String type;
-  String host;
+  String hostName;
+  String address;
   int port;
-  ServiceInfo(this.name, this.type, this.host, this.port);
+  ServiceInfo(this.attr, this.name, this.type, this.hostName, this.address, this.port);
 
   static ServiceInfo fromMap(Map fromChannel){
+    Map<String, Uint8List> attr;
     String name = "";
     String type = "";
-    String host = "";
+    String hostName = "";
+    String address = "";
     int port = 0;
 
-    if ( fromChannel.containsKey("name") ) {
+    if (fromChannel.containsKey("attr") ) {
+      attr = fromChannel["attr"];
+    }
+
+    if (fromChannel.containsKey("name") ) {
       name = fromChannel["name"];
     }
 
@@ -21,20 +30,24 @@ class ServiceInfo{
       type = fromChannel["type"];
     }
 
-    if (fromChannel.containsKey("host")) {
-      host = fromChannel["host"];
+    if (fromChannel.containsKey("hostName")) {
+      hostName = fromChannel["hostName"];
+    }
+
+    if (fromChannel.containsKey("address")) {
+      address = fromChannel["address"];
     }
 
     if (fromChannel.containsKey("port")) {
       port = fromChannel["port"];
     }
 
-    return new ServiceInfo(name, type, host, port);
+    return new ServiceInfo(attr, name, type, hostName, address, port);
   }
 
   @override
   String toString(){
-    return "Name: $name, Type: $type, Host: $host, Port: $port";
+    return "Name: $name, Type: $type, HostName: $hostName, Address: $address, Port: $port";
   }
 }
 typedef void ServiceInfoCallback(ServiceInfo info);
