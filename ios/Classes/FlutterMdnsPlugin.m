@@ -177,7 +177,7 @@
     NSData* data = [aNetService TXTRecordData];
     NSDictionary* dict = [NSNetService dictionaryFromTXTRecordData:data];
     return @{
-            @"attr": nil == dict ? @"" : dict,
+            @"attr": nil == dict ? [NSMutableDictionary dictionary] : dict,
             @"name": nil == [aNetService name] ? @"" : [aNetService name],
             @"type": nil == [aNetService type] ? @"" : [aNetService type],
             @"hostName": nil == [aNetService hostName] ? @"" : [aNetService hostName],

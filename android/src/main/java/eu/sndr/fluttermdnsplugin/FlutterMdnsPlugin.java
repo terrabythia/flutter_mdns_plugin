@@ -9,6 +9,7 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Collections;
 
 import eu.sndr.fluttermdnsplugin.handlers.DiscoveryRunningHandler;
 import eu.sndr.fluttermdnsplugin.handlers.ServiceDiscoveredHandler;
@@ -178,7 +179,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
   private static Map<String, Object> ServiceToMap(NsdServiceInfo info) {
     Map<String, Object> map = new HashMap<>();
 
-    map.put("attr", info.getAttributes() != null ? info.getAttributes() : "");
+    map.put("attr", info.getAttributes() != null ? info.getAttributes() : Collections.emptyMap());
 
     map.put("name", info.getServiceName() != null ? info.getServiceName() : "");
 
