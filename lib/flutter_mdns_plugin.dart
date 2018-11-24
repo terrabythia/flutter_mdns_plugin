@@ -1,19 +1,28 @@
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 class ServiceInfo{
+  Map<String, Uint8List> attr;
   String name;
   String type;
-  String host;
+  String hostName;
+  String address;
   int port;
-  ServiceInfo(this.name, this.type, this.host, this.port);
+  ServiceInfo(this.attr, this.name, this.type, this.hostName, this.address, this.port);
 
   static ServiceInfo fromMap(Map fromChannel){
+    Map<String, Uint8List> attr;
     String name = "";
     String type = "";
-    String host = "";
+    String hostName = "";
+    String address = "";
     int port = 0;
 
-    if ( fromChannel.containsKey("name") ) {
+    if (fromChannel.containsKey("attr") ) {
+      attr = Map<String, Uint8List>.from(fromChannel["attr"]);
+    }
+
+    if (fromChannel.containsKey("name") ) {
       name = fromChannel["name"];
     }
 
@@ -21,20 +30,24 @@ class ServiceInfo{
       type = fromChannel["type"];
     }
 
-    if (fromChannel.containsKey("host")) {
-      host = fromChannel["host"];
+    if (fromChannel.containsKey("hostName")) {
+      hostName = fromChannel["hostName"];
+    }
+
+    if (fromChannel.containsKey("address")) {
+      address = fromChannel["address"];
     }
 
     if (fromChannel.containsKey("port")) {
       port = fromChannel["port"];
     }
 
-    return new ServiceInfo(name, type, host, port);
+    return new ServiceInfo(attr, name, type, hostName, address, port);
   }
 
   @override
   String toString(){
-    return "Name: $name, Type: $type, Host: $host, Port: $port";
+    return "Name: $name, Type: $type, HostName: $hostName, Address: $address, Port: $port";
   }
 }
 typedef void ServiceInfoCallback(ServiceInfo info);
@@ -47,11 +60,13 @@ class DiscoveryCallbacks{
   VoidCallback onDiscoveryStopped;
   ServiceInfoCallback onDiscovered;
   ServiceInfoCallback onResolved;
+  ServiceInfoCallback onLost;
   DiscoveryCallbacks({
     this.onDiscoveryStarted,
     this.onDiscoveryStopped,
     this.onDiscovered,
     this.onResolved,
+    this.onLost,
   });
 }
 
@@ -66,6 +81,9 @@ class FlutterMdnsPlugin {
 
   final EventChannel _serviceResolvedChannel =
   const EventChannel("$NAMESPACE/resolved");
+
+  final EventChannel _serviceLostChannel =
+  const EventChannel("$NAMESPACE/lost");
 
   final EventChannel _discoveryRunningChannel =
   const EventChannel("$NAMESPACE/running");
@@ -84,6 +102,11 @@ class FlutterMdnsPlugin {
       _serviceDiscoveredChannel.receiveBroadcastStream().listen((data) {
         print("Service discovered ${data.toString()}");
         discoveryCallbacks.onDiscovered(ServiceInfo.fromMap(data));
+      });
+
+      _serviceLostChannel.receiveBroadcastStream().listen((data) {
+        print("Service lost ${data.toString()}");
+        discoveryCallbacks.onLost(ServiceInfo.fromMap(data));
       });
 
       _discoveryRunningChannel.receiveBroadcastStream().listen((running) {
