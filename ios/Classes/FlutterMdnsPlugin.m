@@ -2,12 +2,14 @@
 #import "FlutterMdnsPlugin.h"
 #import "ServiceDiscoveredHandler.h"
 #import "ServiceResolvedHandler.h"
+#import "ServiceLostHandler.h"
 #import "DiscoveryRunningHandler.h"
 
 @interface FlutterMdnsPlugin ()
 
 @property(nonatomic, retain) ServiceDiscoveredHandler *serviceDiscoveredHandler;
 @property(nonatomic, retain) ServiceResolvedHandler *serviceResolvedHandler;
+@property(nonatomic, retain) ServiceLostHandler *serviceLostHandler;
 @property(nonatomic, retain) DiscoveryRunningHandler *discoveryRunningHandler;
 
 @property(nonatomic, retain) NSNetServiceBrowser *serviceBrowser;
@@ -37,6 +39,13 @@
                    codec:[FlutterStandardMethodCodec sharedInstance]];
     instance.serviceResolvedHandler = [[ServiceResolvedHandler alloc] init];
     [serviceResolved setStreamHandler:instance.serviceResolvedHandler];
+
+    FlutterEventChannel *serviceLost = [[FlutterEventChannel alloc]
+            initWithName:@"eu.sndr.mdns/lost"
+         binaryMessenger:registrar.messenger
+                   codec:[FlutterStandardMethodCodec sharedInstance]];
+    instance.serviceLostHandler = [[ServiceLostHandler alloc] init];
+    [serviceLost setStreamHandler:instance.serviceLostHandler];
 
     FlutterEventChannel *discoveryRunning = [[FlutterEventChannel alloc]
             initWithName:@"eu.sndr.mdns/running"
@@ -158,6 +167,10 @@
 - (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didRemoveService:(NSNetService *)aNetService moreComing:(BOOL)moreServicesComing
 {
     [self.services removeObject:aNetService];
+
+    [self.serviceLostHandler onServiceLost:
+        [self serviceToDictionary:aNetService]
+    ];
 }
 
 - (NSDictionary *) serviceToDictionary:(NSNetService *)aNetService withAddress:(NSString *)address  {

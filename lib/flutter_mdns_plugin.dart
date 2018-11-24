@@ -60,11 +60,13 @@ class DiscoveryCallbacks{
   VoidCallback onDiscoveryStopped;
   ServiceInfoCallback onDiscovered;
   ServiceInfoCallback onResolved;
+  ServiceInfoCallback onLost;
   DiscoveryCallbacks({
     this.onDiscoveryStarted,
     this.onDiscoveryStopped,
     this.onDiscovered,
     this.onResolved,
+    this.onLost,
   });
 }
 
@@ -79,6 +81,9 @@ class FlutterMdnsPlugin {
 
   final EventChannel _serviceResolvedChannel =
   const EventChannel("$NAMESPACE/resolved");
+
+  final EventChannel _serviceLostChannel =
+  const EventChannel("$NAMESPACE/lost");
 
   final EventChannel _discoveryRunningChannel =
   const EventChannel("$NAMESPACE/running");
@@ -97,6 +102,11 @@ class FlutterMdnsPlugin {
       _serviceDiscoveredChannel.receiveBroadcastStream().listen((data) {
         print("Service discovered ${data.toString()}");
         discoveryCallbacks.onDiscovered(ServiceInfo.fromMap(data));
+      });
+
+      _serviceLostChannel.receiveBroadcastStream().listen((data) {
+        print("Service lost ${data.toString()}");
+        discoveryCallbacks.onLost(ServiceInfo.fromMap(data));
       });
 
       _discoveryRunningChannel.receiveBroadcastStream().listen((running) {
