@@ -20,4 +20,5 @@ public class ServiceResolvedHandler implements EventChannel.StreamHandler {
     public void onServiceResolved(Map<String, Object> serviceInfoMap) {
         sink.success(serviceInfoMap);
     }
+
 }

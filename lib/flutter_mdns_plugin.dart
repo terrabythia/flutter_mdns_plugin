@@ -56,7 +56,10 @@ class DiscoveryCallbacks{
 }
 
 class FlutterMdnsPlugin {
+
   static const String NAMESPACE = "eu.sndr.mdns";
+
+  String _serviceType;
 
   static const MethodChannel _channel =
   const MethodChannel('flutter_mdns_plugin');
@@ -99,13 +102,19 @@ class FlutterMdnsPlugin {
   }
 
   startDiscovery(String serviceType) {
+    _serviceType = serviceType;
     Map args = new Map();
-    args["serviceType"] = serviceType;
+    args["serviceType"] = _serviceType;
     _channel.invokeMethod("startDiscovery", args);
   }
 
   stopDiscovery(){
     _channel.invokeMethod("stopDiscovery", new Map());
+  }
+
+  restartDiscovery() {
+    stopDiscovery();
+    startDiscovery(_serviceType);
   }
 
 }

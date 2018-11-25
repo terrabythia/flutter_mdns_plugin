@@ -13,8 +13,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  FlutterMdnsPlugin _mdnsPlugin;
   List<String> messageLog = <String>[];
   DiscoveryCallbacks discoveryCallbacks;
+  List<ServiceInfo> _discoveredServices = <ServiceInfo>[];
+
   @override
   initState() {
     super.initState();
@@ -48,10 +52,20 @@ class _MyAppState extends State<MyApp> {
   }
 
   startMdnsDiscovery(String serviceType){
-    FlutterMdnsPlugin mdns = new FlutterMdnsPlugin(discoveryCallbacks: discoveryCallbacks);
+    _mdnsPlugin = new FlutterMdnsPlugin(discoveryCallbacks: discoveryCallbacks);
     // cannot directly start discovery, have to wait for ios to be ready first...
-    Timer(Duration(seconds: 3), () => mdns.startDiscovery(serviceType));
+    Timer(Duration(seconds: 3), () => _mdnsPlugin.startDiscovery(serviceType));
 //    mdns.startDiscovery(serviceType);
+  }
+
+  void reassemble() {
+    super.reassemble();
+
+    if (null != _mdnsPlugin) {
+      _discoveredServices = <ServiceInfo>[];
+      _mdnsPlugin.restartDiscovery();
+    }
+
   }
 
   @override

@@ -6,6 +6,7 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
 
   private NsdManager mNsdManager;
   private NsdManager.DiscoveryListener mDiscoveryListener;
+  private ArrayList<NsdServiceInfo> mDiscoveredServices;
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
@@ -39,6 +41,8 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
   }
 
   FlutterMdnsPlugin(Registrar r) {
+
+    mDiscoveredServices = new ArrayList<>();
 
     EventChannel serviceDiscoveredChannel = new EventChannel(r.messenger(), NAMESPACE + "/discovered");
     mDiscoveredHandler = new ServiceDiscoveredHandler();
@@ -53,6 +57,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
     discoveryRunning.setStreamHandler(mDiscoveryRunningHandler);
 
     mRegistrar = r;
+
   }
 
   private Registrar mRegistrar;
@@ -71,6 +76,11 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
       case "stopDiscovery" :
         stopDiscovery();
         result.success(null);
+        break;
+      case "requestDiscoveredServices":
+        for (NsdServiceInfo serviceInfo : mDiscoveredServices) {
+
+        }
         break;
       default:
         result.notImplemented();
@@ -115,6 +125,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
       @Override
       public void onServiceFound(NsdServiceInfo nsdServiceInfo) {
         Log.d(TAG, "Found Service : " + nsdServiceInfo.toString());
+        mDiscoveredServices.add(nsdServiceInfo);
         mDiscoveredHandler.onServiceDiscovered(ServiceToMap(nsdServiceInfo));
 
         mNsdManager.resolveService(nsdServiceInfo, new NsdManager.ResolveListener() {
