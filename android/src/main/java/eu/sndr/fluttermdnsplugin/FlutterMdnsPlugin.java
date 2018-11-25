@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Collections;
 
 import eu.sndr.fluttermdnsplugin.handlers.DiscoveryRunningHandler;
 import eu.sndr.fluttermdnsplugin.handlers.ServiceDiscoveredHandler;
 import eu.sndr.fluttermdnsplugin.handlers.ServiceResolvedHandler;
+import eu.sndr.fluttermdnsplugin.handlers.ServiceLostHandler;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -52,6 +54,10 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
     mResolvedHandler = new ServiceResolvedHandler();
     serviceResolved.setStreamHandler(mResolvedHandler);
 
+    EventChannel serviceLost = new EventChannel(r.messenger(), NAMESPACE + "/lost");
+    mLostHandler = new ServiceLostHandler();
+    serviceLost.setStreamHandler(mLostHandler);
+
     EventChannel discoveryRunning = new EventChannel(r.messenger(), NAMESPACE + "/running");
     mDiscoveryRunningHandler = new DiscoveryRunningHandler();
     discoveryRunning.setStreamHandler(mDiscoveryRunningHandler);
@@ -64,6 +70,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
   private DiscoveryRunningHandler mDiscoveryRunningHandler;
   private ServiceDiscoveredHandler mDiscoveredHandler;
   private ServiceResolvedHandler mResolvedHandler;
+  private ServiceLostHandler mLostHandler;
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
@@ -130,8 +137,22 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
 
         mNsdManager.resolveService(nsdServiceInfo, new NsdManager.ResolveListener() {
           @Override
-          public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int i) {
+          public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int errorCode) {
             Log.d(TAG, "Failed to resolve service : " + nsdServiceInfo.toString());
+
+            switch (errorCode) {
+              case NsdManager.FAILURE_ALREADY_ACTIVE:
+                  Log.e(TAG, "FAILURE_ALREADY_ACTIVE");
+                  // Just try again...
+                  onServiceFound(nsdServiceInfo);
+                  break;
+              case NsdManager.FAILURE_INTERNAL_ERROR:
+                  Log.e(TAG, "FAILURE_INTERNAL_ERROR");
+                  break;
+              case NsdManager.FAILURE_MAX_LIMIT:
+                  Log.e(TAG, "FAILURE_MAX_LIMIT");
+                  break;
+            }
           }
 
           @Override
@@ -144,6 +165,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
       @Override
       public void onServiceLost(NsdServiceInfo nsdServiceInfo) {
         Log.d(TAG, "Lost Service : " + nsdServiceInfo.toString());
+        mLostHandler.onServiceLost(ServiceToMap(nsdServiceInfo));
       }
     };
 
@@ -168,11 +190,15 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
   private static Map<String, Object> ServiceToMap(NsdServiceInfo info) {
     Map<String, Object> map = new HashMap<>();
 
+    map.put("attr", info.getAttributes() != null ? info.getAttributes() : Collections.emptyMap());
+
     map.put("name", info.getServiceName() != null ? info.getServiceName() : "");
 
     map.put("type", info.getServiceType() != null ? info.getServiceType() : "");
 
-    map.put("host", info.getHost() != null ? info.getHost().toString() : "");
+    map.put("hostName", info.getHost() != null ? info.getHost().getHostName() : "");
+
+    map.put("address", info.getHost() != null ? info.getHost().getHostAddress() : "");
 
     map.put("port", info.getPort());
 
