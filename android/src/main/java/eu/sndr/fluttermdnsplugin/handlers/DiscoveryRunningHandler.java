@@ -12,8 +12,8 @@ public class DiscoveryRunningHandler implements EventChannel.StreamHandler {
 
     public DiscoveryRunningHandler(){
         this.handler = new Handler(Looper.getMainLooper());
-
     }
+
     @Override
     public void onListen(Object o, EventChannel.EventSink eventSink) {
         sink = eventSink;
