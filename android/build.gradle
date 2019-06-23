@@ -39,5 +39,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'flutter', include: ['*.aar', '*.jar'], exclude: [])
+    api fileTree(dir: 'flutter', include: ['*.aar', '*.jar'], exclude: [])
 }
+
