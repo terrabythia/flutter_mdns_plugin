@@ -37,8 +37,3 @@ android {
     }
     buildToolsVersion = '29.0.0'
 }
-
-dependencies {
-    api fileTree(dir: 'flutter', include: ['*.aar', '*.jar'], exclude: [])
-}
-
