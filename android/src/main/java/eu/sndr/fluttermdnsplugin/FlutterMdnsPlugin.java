@@ -192,8 +192,47 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
             switch (errorCode) {
               case NsdManager.FAILURE_ALREADY_ACTIVE:
                   Log.e(TAG, "FAILURE_ALREADY_ACTIVE");
-                  // Just try again...
-                  onServiceFound(nsdServiceInfo);
+                  // Retry x number of times and dont re'add to the list in another function
+                  onServiceFoundRetry(nsdServiceInfo, 0);
+                  break;
+              case NsdManager.FAILURE_INTERNAL_ERROR:
+                  Log.e(TAG, "FAILURE_INTERNAL_ERROR");
+                  break;
+              case NsdManager.FAILURE_MAX_LIMIT:
+                  Log.e(TAG, "FAILURE_MAX_LIMIT");
+                  break;
+            }
+          }
+
+          @Override
+          public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
+            mResolvedHandler.onServiceResolved(ServiceToMap(nsdServiceInfo));
+          }
+        });
+      }
+
+      //TODO: Check if this implementation is ok
+      public void onServiceFoundRetry(NsdServiceInfo nsdServiceInfo, int counter) {
+        final int newCounter = counter;
+        if (counter > 20) return;
+        Log.d(TAG, "Found Service retry : " + nsdServiceInfo.toString());
+        mDiscoveredHandler.onServiceDiscovered(ServiceToMap(nsdServiceInfo));
+
+        mNsdManager.resolveService(nsdServiceInfo, new NsdManager.ResolveListener() {
+          @Override
+          public void onResolveFailed(NsdServiceInfo nsdServiceInfo, int errorCode) {
+            Log.d(TAG, "Failed to resolve service : " + nsdServiceInfo.toString());
+
+            switch (errorCode) {
+              case NsdManager.FAILURE_ALREADY_ACTIVE:
+                Log.e(TAG, "FAILURE_ALREADY_ACTIVE");
+                // Just try again...
+                try {
+                  Thread.sleep(1000);
+                } catch(InterruptedException ex) {
+                  Thread.currentThread().interrupt();
+                }
+                onServiceFoundRetry(nsdServiceInfo, newCounter + 1);
                 break;
               case NsdManager.FAILURE_INTERNAL_ERROR:
                 Log.e(TAG, "FAILURE_INTERNAL_ERROR");
@@ -226,6 +265,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
 
     if (mNsdManager != null && mDiscoveryListener != null) {
       mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+      mDiscoveredServices = new ArrayList<>();
     }
 
   }
