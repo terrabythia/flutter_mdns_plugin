@@ -1,9 +1,13 @@
 package eu.sndr.fluttermdnsplugin.handlers;
 
 import io.flutter.plugin.common.EventChannel;
+import android.os.Handler;
+import android.os.Looper;
 
 public class DiscoveryRunningHandler implements EventChannel.StreamHandler {
     EventChannel.EventSink sink;
+    private Handler handler;
+
     @Override
     public void onListen(Object o, EventChannel.EventSink eventSink) {
         sink = eventSink;
@@ -15,10 +19,22 @@ public class DiscoveryRunningHandler implements EventChannel.StreamHandler {
     }
 
     public void onDiscoveryStopped(){
-        sink.success(false);
+        handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                sink.success(true);
+            }
+        });
     }
 
     public void onDiscoveryStarted(){
-        sink.success(true);
+        handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                sink.success(true);
+            }
+        });
     }
 }

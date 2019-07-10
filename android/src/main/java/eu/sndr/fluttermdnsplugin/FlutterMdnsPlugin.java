@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +29,51 @@ import static android.content.ContentValues.TAG;
 
 /** FlutterMdnsPlugin */
 public class FlutterMdnsPlugin implements MethodCallHandler {
+
+  // MethodChannel.Result wrapper that responds on the platform thread.
+  private static class MethodResultWrapper implements Result {
+    private Result methodResult;
+    private Handler handler;
+
+    MethodResultWrapper(Result result) {
+      methodResult = result;
+      handler = new Handler(Looper.getMainLooper());
+    }
+
+    @Override
+    public void success(final Object result) {
+      handler.post(
+              new Runnable() {
+                @Override
+                public void run() {
+                  methodResult.success(result);
+                }
+              });
+    }
+
+    @Override
+    public void error(
+            final String errorCode, final String errorMessage, final Object errorDetails) {
+      handler.post(
+              new Runnable() {
+                @Override
+                public void run() {
+                  methodResult.error(errorCode, errorMessage, errorDetails);
+                }
+              });
+    }
+
+    @Override
+    public void notImplemented() {
+      handler.post(
+              new Runnable() {
+                @Override
+                public void run() {
+                  methodResult.notImplemented();
+                }
+              });
+    }
+  }
 
   private final static String NAMESPACE = "eu.sndr.mdns";
 
@@ -73,7 +120,9 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
   private ServiceLostHandler mLostHandler;
 
   @Override
-  public void onMethodCall(MethodCall call, Result result) {
+  public void onMethodCall(MethodCall call, Result rawResult) {
+
+    Result result = new MethodResultWrapper(rawResult);
 
     switch (call.method) {
       case "startDiscovery":
@@ -145,13 +194,13 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
                   Log.e(TAG, "FAILURE_ALREADY_ACTIVE");
                   // Just try again...
                   onServiceFound(nsdServiceInfo);
-                  break;
+                break;
               case NsdManager.FAILURE_INTERNAL_ERROR:
-                  Log.e(TAG, "FAILURE_INTERNAL_ERROR");
-                  break;
+                Log.e(TAG, "FAILURE_INTERNAL_ERROR");
+                break;
               case NsdManager.FAILURE_MAX_LIMIT:
-                  Log.e(TAG, "FAILURE_MAX_LIMIT");
-                  break;
+                Log.e(TAG, "FAILURE_MAX_LIMIT");
+                break;
             }
           }
 
