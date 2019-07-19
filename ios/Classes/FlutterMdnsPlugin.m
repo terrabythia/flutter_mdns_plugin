@@ -76,7 +76,7 @@
 - (BOOL) areAllStreamHandlersReady {
     return self.serviceDiscoveredHandler.isReady &&
             self.discoveryRunningHandler.isReady &&
-                    self.discoveryRunningHandler.isReady;
+                    self.serviceResolvedHandler.isReady;
 }
 
 - (void) startDiscoveryTimerFinished:(NSTimer *)timer {
