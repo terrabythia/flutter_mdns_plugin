@@ -1,9 +1,11 @@
 package eu.sndr.fluttermdnsplugin;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -77,7 +79,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
 
     switch (call.method) {
       case "startDiscovery":
-        startDiscovery((String) call.argument("serviceType"));
+        startDiscovery(call.argument("serviceType"));
         result.success(null);
         break;
       case "stopDiscovery" :
@@ -187,6 +189,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
    * @param info The ServiceInfo to convert
    * @return The map that can be interpreted by Flutter and sent back on an EventChannel
    */
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   private static Map<String, Object> ServiceToMap(NsdServiceInfo info) {
     Map<String, Object> map = new HashMap<>();
 
