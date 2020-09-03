@@ -1,3 +1,8 @@
+## 0.0.2
+
+* Updated Podfile, updated SDK constraints
+
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial working plugin version
