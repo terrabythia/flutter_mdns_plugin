@@ -13,10 +13,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-  FlutterMdnsPlugin _mdnsPlugin;
+  late FlutterMdnsPlugin _mdnsPlugin;
   List<String> messageLog = <String>[];
-  DiscoveryCallbacks discoveryCallbacks;
+  late DiscoveryCallbacks discoveryCallbacks;
   List<ServiceInfo> _discoveredServices = <ServiceInfo>[];
 
   @override
@@ -24,23 +23,27 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     discoveryCallbacks = new DiscoveryCallbacks(
-      onDiscovered: (ServiceInfo info){
+      onDiscovered: (ServiceInfo info) {
         print("Discovered ${info.toString()}");
-        setState((){
+        setState(() {
           messageLog.insert(0, "DISCOVERY: Discovered ${info.toString()}");
         });
       },
-      onDiscoveryStarted: (){
+      onDiscoveryStarted: () {
         print("Discovery started");
-        setState((){messageLog.insert(0, "DISCOVERY: Discovery Running");});
+        setState(() {
+          messageLog.insert(0, "DISCOVERY: Discovery Running");
+        });
       },
-      onDiscoveryStopped: (){
+      onDiscoveryStopped: () {
         print("Discovery stopped");
-        setState((){messageLog.insert(0, "DISCOVERY: Discovery Not Running");});
+        setState(() {
+          messageLog.insert(0, "DISCOVERY: Discovery Not Running");
+        });
       },
-      onResolved: (ServiceInfo info){
+      onResolved: (ServiceInfo info) {
         print("Resolved Service ${info.toString()}");
-        setState((){
+        setState(() {
           messageLog.insert(0, "DISCOVERY: Resolved ${info.toString()}");
         });
       },
@@ -48,10 +51,9 @@ class _MyAppState extends State<MyApp> {
 
     messageLog.add("Starting mDNS for service [$discovery_service]");
     startMdnsDiscovery(discovery_service);
-
   }
 
-  startMdnsDiscovery(String serviceType){
+  startMdnsDiscovery(String serviceType) {
     _mdnsPlugin = new FlutterMdnsPlugin(discoveryCallbacks: discoveryCallbacks);
     // cannot directly start discovery, have to wait for ios to be ready first...
     Timer(Duration(seconds: 3), () => _mdnsPlugin.startDiscovery(serviceType));
@@ -65,22 +67,19 @@ class _MyAppState extends State<MyApp> {
       _discoveredServices = <ServiceInfo>[];
       _mdnsPlugin.restartDiscovery();
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     return new MaterialApp(
       home: new Scaffold(
           body: new ListView.builder(
-            reverse: true,
-            itemCount: messageLog.length,
-            itemBuilder: (BuildContext context, int index) {
-              return new Text(messageLog[index]);
-            },
-          )
-      ),
+        reverse: true,
+        itemCount: messageLog.length,
+        itemBuilder: (BuildContext context, int index) {
+          return new Text(messageLog[index]);
+        },
+      )),
     );
   }
 }
