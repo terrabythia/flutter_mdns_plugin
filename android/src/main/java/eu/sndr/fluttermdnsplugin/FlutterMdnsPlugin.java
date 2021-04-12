@@ -61,7 +61,7 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
     serviceLost.setStreamHandler(mLostHandler);
 
     EventChannel discoveryRunning = new EventChannel(r.messenger(), NAMESPACE + "/running");
-    mDiscoveryRunningHandler = new DiscoveryRunningHandler();
+    mDiscoveryRunningHandler = new DiscoveryRunningHandler(r.activity());
     discoveryRunning.setStreamHandler(mDiscoveryRunningHandler);
 
     mRegistrar = r;
