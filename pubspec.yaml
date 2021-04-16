@@ -2,11 +2,11 @@ name: flutter_mdns_plugin
 description: Flutter mDNS plugin
 homepage: https://github.com/terrabythia/flutter_mdns_plugin
 repository: https://github.com/terrabythia/flutter_mdns_plugin
-version: 0.0.2
+version: 0.0.3
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
-  flutter: ">=1.12.0 <2.0.0"
+  sdk: '>=2.12.0 <3.0.0'
+  flutter: ">=2.0.3 <3.0.0"
 
 dependencies:
   flutter:
