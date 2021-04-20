@@ -153,6 +153,8 @@ public class FlutterMdnsPlugin implements MethodCallHandler {
                   break;
               case NsdManager.FAILURE_MAX_LIMIT:
                   Log.e(TAG, "FAILURE_MAX_LIMIT");
+                  // https://stackoverflow.com/questions/16736142/nsnetworkmanager-resolvelistener-messages-android
+                  onServiceFound(nsdServiceInfo);
                   break;
             }
           }
