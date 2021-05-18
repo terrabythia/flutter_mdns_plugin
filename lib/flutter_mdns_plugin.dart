@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 class ServiceInfo {
-  Map<String, Uint8List>? attr;
+  Map<String, Uint8List?>? attr;
   String name;
   String type;
   String hostName;
@@ -12,7 +12,7 @@ class ServiceInfo {
       this.attr, this.name, this.type, this.hostName, this.address, this.port);
 
   static ServiceInfo fromMap(Map fromChannel) {
-    Map<String, Uint8List>? attr;
+    Map<String, Uint8List?>? attr;
     String name = "";
     String type = "";
     String hostName = "";
@@ -20,7 +20,7 @@ class ServiceInfo {
     int port = 0;
 
     if (fromChannel.containsKey("attr")) {
-      attr = Map<String, Uint8List>.from(fromChannel["attr"]);
+      attr = Map<String, Uint8List?>.from(fromChannel["attr"]);
     }
 
     if (fromChannel.containsKey("name")) {

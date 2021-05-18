@@ -1,4 +1,5 @@
 *.lock
+.dccache
 
 # Created by https://www.gitignore.io/api/dart,xcode,android,androidstudio
 
