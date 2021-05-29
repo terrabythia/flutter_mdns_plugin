@@ -13,5 +13,3 @@ https://github.com/platinumjam/flutter_mdns
 
 Most of the code for iOS came from this resource:
 https://www.eventbrite.com/engineering/bonjour-gatekeeper-how-to-implement-bonjour-service-in-an-ios-or-android-app/
-
-Will be better documented in the near future.
