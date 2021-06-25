@@ -32,8 +32,12 @@ public class DiscoveryRunningHandler implements EventChannel.StreamHandler {
     }
 
     public void onDiscoveryStopped(){
-        multicastLock.release();
-        handler.post(() -> sink.success(false));
+        if (multicastLock.isHeld()) {
+            //This is the fix for android crash 'NsdManager MulticastLock under-locked multicastLock'.
+            //https://stackoverflow.com/a/14949367/468952
+            multicastLock.release();
+            handler.post(() -> sink.success(false));
+        }
     }
 
     public void onDiscoveryStarted(){
